@@ -1,0 +1,21 @@
+{
+  "name": "incident-hub",
+  "version": "0.1.0",
+  "description": "IT Incident Hub - proyecto integrador DevOps",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev": "node --watch backend/src/server.js",
+    "test": "node --test tests/*.test.js",
+    "lint": "eslint backend/src tests",
+    "check": "npm run lint && npm test"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.35.0"
+  }
+}
