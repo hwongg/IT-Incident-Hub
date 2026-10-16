@@ -86,7 +86,7 @@ $("#incident-form").addEventListener("submit", async (event) => {
   $("#form-message").textContent = "Guardando...";
   try {
     await api("/api/incidents", { method: "POST", body: JSON.stringify(body) });
-    event.currentTarget.reset();
+    event.target.reset();
     $("#form-message").textContent = "Incidente registrado correctamente.";
     await refreshAll();
   } catch (error) {
@@ -133,7 +133,7 @@ $("#comment-form").addEventListener("submit", async (event) => {
   const form = Object.fromEntries(new FormData(event.currentTarget).entries());
   try {
     await api(`/api/incidents/${activeIncidentId}/comments`, { method: "POST", body: JSON.stringify(form) });
-    event.currentTarget.reset();
+    event.target.reset();
     await showDetails(activeIncidentId);
   } catch (error) {
     alert(error.message);
