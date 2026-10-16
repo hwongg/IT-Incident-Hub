@@ -22,10 +22,10 @@ steps:
     displayName: Checkout source
     clean: true
 
-  - task: NodeTool@0
+  - task: UseNode@1
     displayName: Install Node.js
     inputs:
-      versionSpec: $(NODE_VERSION)
+      version: $(NODE_VERSION)
 
   - script: npm ci
     displayName: Install dependencies
@@ -40,8 +40,13 @@ steps:
     displayName: Dependency security review
 
   - powershell: |
-      New-Item -ItemType Directory -Force -Path "$(Build.ArtifactStagingDirectory)\incident-hub" | Out-Null
-      Compress-Archive -Path "backend", "frontend", "database", "tests", "package.json", "package-lock.json", "compose.yaml", "Dockerfile", "README.md" -DestinationPath "$(Build.ArtifactStagingDirectory)\incident-hub\source.zip" -Force
+      $artifactDir = "$(Build.ArtifactStagingDirectory)\incident-hub"
+      New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
+
+      Compress-Archive `
+        -Path "backend", "frontend", "database", "tests", "package.json", "package-lock.json", "compose.yaml", "Dockerfile", "README.md" `
+        -DestinationPath "$artifactDir\source.zip" `
+        -Force
     displayName: Build and package application
 
   - task: PublishBuildArtifacts@1
