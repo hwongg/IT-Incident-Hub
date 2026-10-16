@@ -3,6 +3,7 @@ const helmet = require("helmet");
 const path = require("path");
 const pool = require("./db");
 const { statuses, priorities, validateIncident } = require("./validation");
+const { getPagination } = require("./pagination");
 
 const app = express();
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -20,36 +21,80 @@ app.get("/api/health", async (_req, res) => {
 
 app.get("/api/meta", (req, res) => res.json({ statuses, priorities }));
 
+
 app.get("/api/incidents", async (req, res, next) => {
   try {
     const { status, priority, category, technician, q } = req.query;
+
+    const validNumber = (value) =>
+      typeof value === "string" && /^\d+$/.test(value) &&
+      Number.isSafeInteger(Number(value));
+
+    if (req.query.limit !== undefined && !validNumber(req.query.limit)) {
+      return res.status(400).json({ error: "Limit debe ser un entero valido" });
+    }
+
+    if (req.query.offset !== undefined && !validNumber(req.query.offset)) {
+      return res.status(400).json({ error: "Offset debe ser un entero valido" });
+    }
+
+    const pagination = getPagination(req.query);
+
+    if (pagination.error) {
+      return res.status(400).json({ error: pagination.error });
+    }
+
+    const { limit, offset } = pagination;
+
+  
+    if (limit < 1 || limit > 100) {
+      return res.status(400).json({ error: "Limit debe estar entre 1 y 100" });
+    }
+
+    if (offset < 0) {
+      return res.status(400).json({ error: "Offset no puede ser negativo" });
+    }
+
     const conditions = [];
     const values = [];
+
     const add = (column, value) => {
       if (value) {
         values.push(value);
         conditions.push(`${column} = $${values.length}`);
       }
     };
+
     add("status", status);
     add("priority", priority);
     add("category", category);
     add("technician", technician);
+
     if (q) {
       values.push(`%${q}%`);
       conditions.push(`(title ILIKE $${values.length} OR description ILIKE $${values.length})`);
     }
+
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    values.push(limit, offset);
+
     const result = await pool.query(
-      `SELECT i.*, (SELECT COUNT(*) FROM incident_comments c WHERE c.incident_id = i.id)::int AS comment_count
-       FROM incidents i ${where} ORDER BY i.created_at DESC`,
+      `SELECT i.*,
+        (SELECT COUNT(*) FROM incident_comments c WHERE c.incident_id = i.id)::int AS comment_count
+       FROM incidents i
+       ${where}
+       ORDER BY i.created_at DESC, i.id DESC
+       LIMIT $${values.length - 1} OFFSET $${values.length}`,
       values
     );
+
     res.json(result.rows);
   } catch (error) {
     next(error);
   }
 });
+
 
 app.get("/api/incidents/:id", async (req, res, next) => {
   try {
