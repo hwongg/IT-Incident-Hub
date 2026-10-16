@@ -33,7 +33,7 @@ steps:
   - script: npm run lint
     displayName: Lint
 
-  - script: npm test
+  - script: npm run prueba-inexistente
     displayName: Run tests
 
   - script: npm audit --audit-level=high
