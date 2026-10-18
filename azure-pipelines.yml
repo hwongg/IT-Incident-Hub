@@ -16,6 +16,7 @@ pool:
 
 variables:
   NODE_VERSION: '22.x'
+  COMPOSE_PROJECT_NAME: incident-hub-ci-$(Build.BuildId)
 
 steps:
   - checkout: self
@@ -31,22 +32,65 @@ steps:
     displayName: Install dependencies
 
   - script: npm run lint
-    displayName: Lint
+    displayName: Run ESLint
 
   - script: npm test
-    displayName: Run tests
+    displayName: Run 13 unit tests
+
+  - powershell: |
+      $ErrorActionPreference = "Stop"
+
+      docker version
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      docker compose version
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      docker compose -f compose.yaml -f compose.ci.yaml up -d --wait db
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      docker compose -f compose.yaml -f compose.ci.yaml exec -T db `
+        psql -v ON_ERROR_STOP=1 -U incident_user -d postgres `
+        -c "CREATE DATABASE incident_hub_test;"
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      Get-Content database/init.sql -Raw |
+        docker compose -f compose.yaml -f compose.ci.yaml exec -T db `
+        psql -v ON_ERROR_STOP=1 -U incident_user -d incident_hub_test
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    displayName: Prepare PostgreSQL test database
+    env:
+      POSTGRES_PASSWORD: $(CI_POSTGRES_PASSWORD)
+
+  - powershell: |
+      $ErrorActionPreference = "Stop"
+
+      $env:TEST_DATABASE_URL = "postgres://incident_user:$env:POSTGRES_PASSWORD@127.0.0.1:5434/incident_hub_test"
+
+      npm run test:integration
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    displayName: Run 5 PostgreSQL integration tests
+    env:
+      POSTGRES_PASSWORD: $(CI_POSTGRES_PASSWORD)
 
   - script: npm audit --audit-level=high
     displayName: Dependency security review
 
   - powershell: |
+      $ErrorActionPreference = "Stop"
+
       $artifactDir = "$(Build.ArtifactStagingDirectory)\incident-hub"
+
       New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
       Compress-Archive `
-        -Path "backend", "frontend", "database", "tests", "package.json", "package-lock.json", "compose.yaml", "Dockerfile", "README.md" `
+        -Path "backend", "frontend", "database", "tests", "package.json", "package-lock.json", "compose.yaml", "compose.ci.yaml", "Dockerfile", "README.md" `
         -DestinationPath "$artifactDir\source.zip" `
         -Force
+
+      if (-not (Test-Path "$artifactDir\source.zip")) {
+        throw "No se pudo generar el artefacto."
+      }
     displayName: Build and package application
 
   - task: PublishBuildArtifacts@1
@@ -55,3 +99,11 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)\incident-hub'
       ArtifactName: incident-hub
       publishLocation: Container
+
+  - powershell: |
+      docker compose -f compose.yaml -f compose.ci.yaml down -v
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    displayName: Clean up PostgreSQL test containers
+    condition: always()
+    env:
+      POSTGRES_PASSWORD: $(CI_POSTGRES_PASSWORD)

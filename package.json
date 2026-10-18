@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node backend/src/server.js",
     "dev": "node --watch backend/src/server.js",
-    "test": "node --test tests/*.test.js",
+    "test": "node --test tests/validation.test.js tests/pagination.test.js",
     "lint": "eslint backend/src tests",
-    "check": "npm run lint && npm test"
+    "check": "npm run lint && npm test",
+    "test:integration": "node --test tests/integration.test.js"
   },
   "dependencies": {
     "express": "^4.21.2",
