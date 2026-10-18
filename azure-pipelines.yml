@@ -69,7 +69,7 @@ steps:
 
       npm run test:integration
       if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-    displayName: Run 5 PostgreSQL integration tests
+    displayName: Run 7 PostgreSQL integration tests
     env:
       POSTGRES_PASSWORD: $(CI_POSTGRES_PASSWORD)
 

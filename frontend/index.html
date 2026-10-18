@@ -1,56 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IT Incident Hub</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>IT Incident Hub | Gestión de incidentes</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div><span class="brand-mark">IH</span><div><h1>IT Incident Hub</h1><p>Centro de gestión de incidentes TI</p></div></div>
-    <span class="live"><i></i> Servicio operativo</span>
-  </header>
-  <main>
-    <section class="intro">
-      <div><p class="eyebrow">MESA DE SERVICIO</p><h2>Panel de incidentes</h2><p>Registre, asigne y dé seguimiento a los incidentes.</p></div>
-      <button id="show-form" class="primary">＋ Nuevo incidente</button>
-    </section>
-    <section class="metrics">
-      <article><span>Incidentes abiertos</span><strong id="metric-open">—</strong><small>Requieren atención</small></article>
-      <article><span>Incidentes cerrados</span><strong id="metric-closed">—</strong><small>Resueltos o cerrados</small></article>
-      <article><span>Críticos abiertos</span><strong id="metric-critical">—</strong><small>Prioridad crítica</small></article>
-      <article><span>Total registrados</span><strong id="metric-total">—</strong><small>Todos los incidentes</small></article>
-    </section>
-    <section id="form-panel" class="panel hidden">
-      <div class="panel-heading"><div><h3>Registrar incidente</h3><p>Complete los datos solicitados.</p></div><button id="hide-form" class="ghost" aria-label="Cerrar">✕</button></div>
-      <form id="incident-form" class="form-grid">
-        <label>Título<input name="title" required maxlength="160" placeholder="Ej. Equipo no enciende"></label>
-        <label>Usuario que reporta<input name="reporter" required maxlength="120" placeholder="Nombre del usuario"></label>
-        <label>Categoría<select name="category" required><option value="Hardware">Hardware</option><option value="Software">Software</option><option value="Redes">Redes</option><option value="Accesos">Accesos</option><option value="Sistemas">Sistemas</option><option value="Otro">Otro</option></select></label>
-        <label>Prioridad<select name="priority" required><option value="BAJA">Baja</option><option value="MEDIA" selected>Media</option><option value="ALTA">Alta</option><option value="CRITICA">Crítica</option></select></label>
-        <label class="wide">Descripción<textarea name="description" required rows="3" placeholder="Describa el problema y cuándo comenzó"></textarea></label>
-        <div class="wide form-actions"><button class="primary" type="submit">Guardar incidente</button><span id="form-message" role="status"></span></div>
-      </form>
-    </section>
-    <section class="panel">
-      <div class="panel-heading"><div><h3>Incidentes registrados</h3><p>Filtre y actualice el estado de cada caso.</p></div><button id="refresh" class="ghost">↻ Actualizar</button></div>
-      <div class="filters">
-        <input id="search" placeholder="Buscar incidente..." aria-label="Buscar incidente">
-        <select id="filter-status" aria-label="Filtrar por estado"><option value="">Todos los estados</option></select>
-        <select id="filter-priority" aria-label="Filtrar por prioridad"><option value="">Todas las prioridades</option><option>BAJA</option><option>MEDIA</option><option>ALTA</option><option>CRITICA</option></select>
-        <select id="filter-category" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option><option>Hardware</option><option>Software</option><option>Redes</option><option>Accesos</option><option>Sistemas</option><option>Otro</option></select>
-        <input id="filter-technician" placeholder="Técnico exacto" aria-label="Filtrar por técnico">
-      </div>
-      <div class="table-wrap"><table><thead><tr><th>Incidente</th><th>Categoría</th><th>Prioridad</th><th>Estado</th><th>Técnico</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="incident-rows"><tr><td colspan="7">Cargando...</td></tr></tbody></table></div>
-      <p id="list-message" class="muted" role="status"></p>
-    </section>
-    <section class="two-col">
-      <article class="panel"><div class="panel-heading"><div><h3>Por categoría</h3><p>Distribución de incidentes</p></div></div><div id="category-stats" class="stats-list"></div></article>
-      <article class="panel"><div class="panel-heading"><div><h3>Por técnico</h3><p>Carga de trabajo asignada</p></div></div><div id="technician-stats" class="stats-list"></div></article>
-    </section>
-  </main>
-  <dialog id="detail-dialog"><div class="panel-heading"><div><h3 id="detail-title">Detalle</h3><p id="detail-subtitle"></p></div><button id="close-detail" class="ghost">✕</button></div><div id="detail-content"></div><form id="comment-form" class="comment-form"><label>Su nombre<input name="author" required placeholder="Nombre"></label><label>Comentario<textarea name="comment" required rows="2" maxlength="3000" placeholder="Escriba una actualización"></textarea></label><button class="primary">Agregar comentario</button></form></dialog>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon">IH</span><div><strong>IT Incident Hub</strong><small>Mesa de servicio TI</small></div></div>
+      <div class="nav-label">ESPACIO DE TRABAJO</div>
+      <nav aria-label="Navegación principal">
+        <a href="#dashboard" class="nav-link active">◫ &nbsp; Panel general</a>
+        <a href="#incidentes" class="nav-link">▤ &nbsp; Incidentes</a>
+        <a href="#estadisticas" class="nav-link">▥ &nbsp; Estadísticas</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-dot"></span> Servicio operativo <small>IT Incident Hub · v1.1</small></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar"><div><span class="breadcrumb">Mesa de servicio / Panel general</span><h1>Gestión de incidentes</h1></div><button class="primary" id="show-form">+ Nuevo incidente</button></header>
+      <main>
+        <section id="dashboard" class="intro"><div><span class="eyebrow">RESUMEN OPERATIVO</span><h2>Panel general</h2><p>Supervisá los incidentes y gestioná las solicitudes de soporte.</p></div><button class="secondary" id="refresh">↻ Actualizar datos</button></section>
+        <section class="metrics" aria-label="Indicadores"><article class="metric"><span>Total de incidentes</span><strong id="metric-total">—</strong><small>Registrados en el sistema</small></article><article class="metric"><span>Incidentes abiertos</span><strong id="metric-open">—</strong><small>Pendientes de resolución</small></article><article class="metric"><span>Resueltos o cerrados</span><strong id="metric-closed">—</strong><small>Casos completados</small></article><article class="metric critical"><span>Críticos abiertos</span><strong id="metric-critical">—</strong><small>Requieren atención inmediata</small></article></section>
+        <section id="incidentes" class="panel"><div class="panel-heading"><div><span class="eyebrow">GESTIÓN</span><h3>Incidentes registrados</h3><p>Consultá, editá y administrá los casos de soporte.</p></div><span id="result-count" class="count">—</span></div>
+          <div class="filters"><input id="search" type="search" placeholder="Buscar por título o descripción..." aria-label="Buscar incidentes"><select id="filter-status" aria-label="Filtrar por estado"><option value="">Todos los estados</option></select><select id="filter-priority" aria-label="Filtrar por prioridad"><option value="">Todas las prioridades</option><option value="BAJA">Baja</option><option value="MEDIA">Media</option><option value="ALTA">Alta</option><option value="CRITICA">Crítica</option></select><select id="filter-category" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option><option>Hardware</option><option>Software</option><option>Redes</option><option>Accesos</option><option>Sistemas</option><option>Otro</option></select><input id="filter-technician" placeholder="Técnico exacto" aria-label="Filtrar por técnico"></div>
+          <div class="table-wrap"><table><thead><tr><th>ID / Incidente</th><th>Categoría</th><th>Prioridad</th><th>Estado</th><th>Técnico</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody id="incident-rows"><tr><td colspan="7">Cargando incidentes...</td></tr></tbody></table></div>
+          <div class="table-footer"><p id="list-message" role="status"></p><div class="pager"><button id="page-prev" class="secondary" disabled>← Anterior</button><span id="page-info">Página 1</span><button id="page-next" class="secondary" disabled>Siguiente →</button></div></div>
+        </section>
+        <section id="estadisticas" class="stats-grid"><article class="panel"><div class="panel-heading"><div><h3>Incidentes por categoría</h3><p>Distribución de solicitudes</p></div></div><div id="category-stats" class="stats-list"></div></article><article class="panel"><div class="panel-heading"><div><h3>Incidentes por técnico</h3><p>Carga de trabajo</p></div></div><div id="technician-stats" class="stats-list"></div></article></section>
+      </main>
+    </div>
+  </div>
+  <dialog id="form-dialog"><div class="dialog-heading"><div><span class="eyebrow">GESTIÓN DE INCIDENTES</span><h3 id="form-title">Nuevo incidente</h3><p id="form-subtitle">Completá los datos del caso.</p></div><button type="button" class="close" id="hide-form" aria-label="Cerrar">×</button></div><form id="incident-form"><div class="form-grid"><label>Título<input name="title" required maxlength="160" placeholder="Ej. Equipo no enciende"></label><label>Reportado por<input name="reporter" required maxlength="120" placeholder="Nombre del usuario"></label><label>Categoría<select name="category" required><option>Hardware</option><option>Software</option><option>Redes</option><option>Accesos</option><option>Sistemas</option><option>Otro</option></select></label><label>Prioridad<select name="priority" required><option value="BAJA">Baja</option><option value="MEDIA" selected>Media</option><option value="ALTA">Alta</option><option value="CRITICA">Crítica</option></select></label><label class="wide">Descripción<textarea name="description" required rows="4" placeholder="Describí el problema"></textarea></label><label class="edit-only">Estado<select name="status" id="form-status"></select></label><label>Técnico asignado (opcional)<input name="technician" maxlength="120" placeholder="Sin asignar"></label></div><p id="form-message" role="status" class="message"></p><div class="dialog-actions"><button type="button" class="secondary" id="cancel-form">Cancelar</button><button class="primary" type="submit" id="submit-form">Guardar incidente</button></div></form></dialog>
+  <dialog id="detail-dialog"><div class="dialog-heading"><div><span class="eyebrow">DETALLE DEL CASO</span><h3 id="detail-title">Incidente</h3><p id="detail-subtitle"></p></div><button class="close" id="close-detail" aria-label="Cerrar">×</button></div><div id="detail-content"></div><form id="comment-form" class="comment-form"><h4>Agregar comentario</h4><label>Tu nombre<input name="author" required maxlength="120" placeholder="Nombre"></label><label>Comentario<textarea name="comment" required rows="3" maxlength="3000" placeholder="Escribí una actualización"></textarea></label><p id="comment-message" class="message" role="status"></p><button class="primary">Publicar comentario</button></form></dialog>
   <script src="app.js"></script>
 </body>
 </html>

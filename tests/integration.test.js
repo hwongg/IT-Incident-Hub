@@ -135,3 +135,99 @@ test("validar paginacion contra PostgreSQL", async () => {
   assert.ok(Array.isArray(respuesta.body));
   assert.ok(respuesta.body.length <= 5);
 });
+
+
+test("crear y eliminar incidente con sus comentarios", async () => {
+  const registro = await peticion("/api/incidents", {
+    method: "POST",
+    body: JSON.stringify({
+      title: "Prueba de eliminacion AB33",
+      description: "Verificar eliminacion en PostgreSQL",
+      category: "Software",
+      priority: "MEDIA",
+      reporter: "Pruebas automatizadas"
+    })
+  });
+
+  assert.equal(registro.status, 201);
+
+  const id = registro.body.id;
+
+  try {
+    const eliminacion = await peticion(`/api/incidents/${id}`, {
+      method: "DELETE"
+    });
+
+    assert.equal(eliminacion.status, 200);
+    assert.equal(eliminacion.body.incident.id, id);
+
+    const consulta = await peticion(`/api/incidents/${id}`);
+    assert.equal(consulta.status, 404);
+
+    const comentarios = await pool.query(
+      "SELECT id FROM incident_comments WHERE incident_id = $1",
+      [id]
+    );
+
+    assert.equal(comentarios.rowCount, 0);
+  } finally {
+    await pool.query("DELETE FROM incidents WHERE id = $1", [id]);
+  }
+});
+
+
+test("editar todos los campos de un incidente", async () => {
+  const registro = await peticion("/api/incidents", {
+    method: "POST",
+    body: JSON.stringify({
+      title: "Incidente original",
+      description: "Descripcion original",
+      category: "Hardware",
+      priority: "BAJA",
+      reporter: "Usuario original"
+    })
+  });
+
+  assert.equal(registro.status, 201);
+
+  const id = registro.body.id;
+
+  try {
+    const respuesta = await peticion(`/api/incidents/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: "Incidente actualizado",
+        description: "Descripcion actualizada",
+        category: "Software",
+        priority: "CRITICA",
+        reporter: "Usuario actualizado",
+        technician: "Tecnico asignado",
+        status: "EN_PROCESO",
+        author: "Administrador"
+      })
+    });
+
+    assert.equal(respuesta.status, 200);
+    assert.equal(respuesta.body.title, "Incidente actualizado");
+    assert.equal(respuesta.body.description, "Descripcion actualizada");
+    assert.equal(respuesta.body.category, "Software");
+    assert.equal(respuesta.body.priority, "CRITICA");
+    assert.equal(respuesta.body.reporter, "Usuario actualizado");
+    assert.equal(respuesta.body.technician, "Tecnico asignado");
+    assert.equal(respuesta.body.status, "EN_PROCESO");
+
+    const detalle = await peticion(`/api/incidents/${id}`);
+
+    assert.equal(detalle.status, 200);
+    assert.ok(
+      detalle.body.comments.some(
+        (comment) => comment.author === "Administrador"
+      )
+    );
+  } finally {
+    await pool.query(
+      "DELETE FROM incidents WHERE id = $1",
+      [id]
+    );
+  }
+});
