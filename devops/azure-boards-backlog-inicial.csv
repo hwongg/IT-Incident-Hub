@@ -1,0 +1,29 @@
+Work Item Type,Title,Description,State,Priority,Effort,Assigned To,Parent
+Epic,Gestión de incidentes,Administrar el ciclo de vida de los incidentes,New,1,13,,
+Feature,Registro y consulta,Crear y consultar incidentes,New,1,5,,Gestión de incidentes
+User Story,Registrar incidente,Como usuario quiero registrar un incidente para reportar un problema,New,1,3,,Registro y consulta
+Task,Crear tabla incidents,Definir esquema SQL de incidentes,New,1,2,,Registrar incidente
+Task,Crear formulario,Construir formulario de alta,New,2,2,,Registrar incidente
+User Story,Consultar incidentes,Como usuario quiero ver incidentes registrados,New,1,3,,Registro y consulta
+Task,Crear endpoint de listado,Implementar GET de incidentes,New,1,2,,Consultar incidentes
+Task,Mostrar tabla web,Mostrar lista de incidentes,New,2,2,,Consultar incidentes
+Feature,Asignación y seguimiento,Asignar técnico y registrar cambios,New,1,5,,Gestión de incidentes
+User Story,Asignar técnico,Como operador quiero asignar un técnico responsable,New,1,3,,Asignación y seguimiento
+Task,Endpoint de asignación,Actualizar técnico responsable,New,1,2,,Asignar técnico
+Task,Bitácora de cambios,Registrar cambios en comentarios,New,1,2,,Asignar técnico
+User Story,Cambiar estado,Como operador quiero actualizar el estado del incidente,New,1,3,,Asignación y seguimiento
+Task,Validar estados,Aplicar los cinco estados permitidos,New,1,2,,Cambiar estado
+Task,Actualizar estado en UI,Permitir cambiar estado desde la tabla,New,2,2,,Cambiar estado
+Epic,Entrega continua y calidad,Automatizar validación y lanzamiento,New,1,13,,
+Feature,Automatización CI,Ejecutar validaciones en cada cambio,New,1,5,,Entrega continua y calidad
+User Story,Ejecutar pruebas automáticas,Como equipo quiero detectar errores automáticamente,New,1,3,,Automatización CI
+Task,Configurar Node test runner,Crear pruebas de validación,New,1,2,,Ejecutar pruebas automáticas
+Task,Configurar ESLint,Aplicar reglas básicas de calidad,New,1,2,,Ejecutar pruebas automáticas
+Feature,Seguridad y dependencias,Revisar dependencias y proteger secretos,New,1,5,,Entrega continua y calidad
+User Story,Analizar dependencias,Como equipo quiero conocer vulnerabilidades de paquetes,New,1,3,,Seguridad y dependencias
+Task,Configurar npm audit,Ejecutar auditoría de dependencias,New,1,2,,Analizar dependencias
+Task,Documentar vulnerabilidades,Registrar severidad y decisión,New,1,2,,Analizar dependencias
+Feature,Release y artefactos,Versionar y publicar una versión verificable,New,1,5,,Entrega continua y calidad
+User Story,Publicar artefacto,Como responsable quiero conservar un artefacto desplegable,New,1,3,,Release y artefactos
+Task,Empaquetar aplicación,Generar archivo comprimido del proyecto,New,1,2,,Publicar artefacto
+Task,Documentar release,Definir tag y procedimiento de rollback,New,1,2,,Publicar artefacto
