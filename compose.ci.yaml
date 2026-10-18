@@ -1,0 +1,10 @@
+
+services:
+  db:
+    ports: !override
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - ci_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  ci_postgres_data:
