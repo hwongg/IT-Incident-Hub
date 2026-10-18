@@ -16,6 +16,7 @@ pool:
 
 variables:
   NODE_VERSION: '22.x'
+  COMPOSE_PROJECT_NAME: incident-hub-ci-$(Build.BuildId)
 
 steps:
   - checkout: self
@@ -34,7 +35,30 @@ steps:
     displayName: Lint
 
   - script: npm test
-    displayName: Run tests
+    displayName: Run unit tests
+
+  - powershell: |
+      $ErrorActionPreference = "Stop"
+      $env:POSTGRES_PASSWORD = "$(CI_POSTGRES_PASSWORD)"
+
+      docker compose -f compose.yaml -f compose.ci.yaml up -d --wait db
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      docker compose -f compose.yaml -f compose.ci.yaml exec -T db psql -v ON_ERROR_STOP=1 -U incident_user -d postgres -c "CREATE DATABASE incident_hub_test;"
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      Get-Content database/init.sql -Raw | docker compose -f compose.yaml -f compose.ci.yaml exec -T db psql -v ON_ERROR_STOP=1 -U incident_user -d incident_hub_test
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    displayName: Prepare PostgreSQL test database
+
+  - powershell: |
+      $env:TEST_DATABASE_URL = "postgres://incident_user:$env:POSTGRES_PASSWORD@127.0.0.1:5433/incident_hub_test"
+
+      npm run test:integration
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    displayName: Run PostgreSQL integration tests
+    env:
+      POSTGRES_PASSWORD: $(CI_POSTGRES_PASSWORD)
 
   - script: npm audit --audit-level=high
     displayName: Dependency security review
@@ -55,3 +79,11 @@ steps:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)\incident-hub'
       ArtifactName: incident-hub
       publishLocation: Container
+
+  - powershell: |
+      docker compose -f compose.yaml -f compose.ci.yaml down -v
+      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    displayName: Clean up test containers
+    condition: always()
+    env:
+      POSTGRES_PASSWORD: $(CI_POSTGRES_PASSWORD)
