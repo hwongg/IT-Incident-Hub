@@ -63,12 +63,16 @@ Evidencias:
 - Pull Requests #7 y #8.
 - GitHub Actions aprobado.
 - Azure Pipelines `#20261018.2`, intento 2, aprobado.
-- 13 pruebas unitarias y 5 pruebas de integración aprobadas.
-- Tag `v1.0.0` y release, una vez publicados.
+- 13 pruebas unitarias y 7 pruebas de integración aprobadas en la versión v1.1.0.
+- Tags y releases `v1.0.0` y `v1.1.0` publicados.
 - Evidencias de demostración funcional.
 
 ## Entrega final
 
-Se entregará un único repositorio que contendrá el código fuente, documentación, configuración de Docker, pipelines, historial de desarrollo y referencias a Azure Boards.
+La entrega final se realiza mediante un único repositorio, conforme a la indicación del docente. Este repositorio que contendrá el código fuente, documentación, configuración de Docker, pipelines, historial de desarrollo y referencias a Azure Boards.
 
 Las evidencias deberán corresponder a ejecuciones, cambios y revisiones reales. No se crearán commits, aprobaciones o Pull Requests ficticios para completar los requisitos.
+
+## Actualización final v1.1.0
+
+El [PR #9](https://github.com/hwongg/IT-Incident-Hub/pull/9) incorporó el dashboard renovado, el CRUD completo y las pruebas adicionales. Las validaciones de GitHub Actions y Azure Pipelines fueron exitosas y se publicó la release `v1.1.0`. Las evidencias están organizadas en `docs/evidencias/`.

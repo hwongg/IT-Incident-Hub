@@ -74,7 +74,7 @@ Los errores relacionados con consultas SQL, conexiones y operaciones de base de 
 
 **Solución implementada:**
 
-Se incorporaron cinco pruebas de integración automatizadas utilizando PostgreSQL 16 y una base de datos de pruebas aislada mediante Docker Compose.
+Se incorporaron inicialmente cinco pruebas de integración automatizadas utilizando PostgreSQL 16 y una base de datos de pruebas aislada mediante Docker Compose.
 
 Las pruebas verifican:
 
@@ -84,7 +84,7 @@ Las pruebas verifican:
 4. La validación de datos inválidos.
 5. El funcionamiento de la paginación.
 
-También se integraron estas pruebas en los flujos de integración continua de GitHub Actions y Azure Pipelines.
+Posteriormente, el PR #9 amplió el conjunto a siete pruebas, incorporando eliminación de incidentes con comentarios y edición completa. Las pruebas de integración se ejecutan en Azure Pipelines con PostgreSQL aislado; GitHub Actions realiza comprobaciones complementarias de calidad.
 
 **Trazabilidad:**
 
@@ -98,7 +98,7 @@ También se integraron estas pruebas en los flujos de integración continua de G
 **Evidencias de validación:**
 
 - 13 pruebas unitarias aprobadas.
-- 5 pruebas de integración aprobadas.
+- 7 pruebas de integración aprobadas en la versión v1.1.0 (cinco iniciales en PR #8).
 - GitHub Actions ejecutado satisfactoriamente.
 - Azure Pipelines `#20261018.2`, intento 2, ejecutado satisfactoriamente.
 - Limpieza automatizada de los recursos de PostgreSQL utilizados durante las pruebas.
@@ -161,7 +161,7 @@ Se resolvieron dos deudas técnicas mediante cambios verificables, siguiendo el 
 | Deuda resuelta | Work Item | Rama | Pull Request | Evidencia |
 |---|---|---|---|---|
 | DT-02 — Paginación de incidentes | Referencia del PR #7 | Rama de implementación del PR #7 | [PR #7](https://github.com/hwongg/IT-Incident-Hub/pull/7) | Pruebas de paginación y controles de calidad |
-| DT-03 — Pruebas de integración PostgreSQL | AB#32 | `test/AB32-integracion-postgresql` | [PR #8](https://github.com/hwongg/IT-Incident-Hub/pull/8) | 5 pruebas de integración, GitHub Actions y Azure Pipelines aprobados |
+| DT-03 — Pruebas de integración PostgreSQL | AB#32 | `test/AB32-integracion-postgresql` | [PR #8](https://github.com/hwongg/IT-Incident-Hub/pull/8) | 7 pruebas de integración en v1.1.0; CI verificada |
 
 ## 5. Validación mediante integración continua
 
@@ -194,15 +194,19 @@ La base de datos de integración utiliza una configuración Docker Compose aisla
 | Deudas técnicas pendientes | 4 |
 | Pull Requests de resolución | #7 y #8 |
 | Pruebas unitarias aprobadas | 13 |
-| Pruebas de integración aprobadas | 5 |
+| Pruebas de integración aprobadas | 7 |
 | Integración continua | GitHub Actions y Azure Pipelines |
 
 ## 7. Conclusión
 
 La gestión de deuda técnica permitió identificar limitaciones del sistema y aplicar mejoras verificables en su implementación.
 
-La resolución de **DT-02** mejoró el manejo de grandes cantidades de incidentes mediante paginación, mientras que la resolución de **DT-03** fortaleció la confiabilidad del proyecto al incorporar pruebas automatizadas con PostgreSQL real.
+La resolución de **DT-02** y **DT-03** mejoró el rendimiento de las consultas y la confianza en el acceso a PostgreSQL. Las cuatro deudas restantes se mantienen documentadas para futuras iteraciones.* mejoró el manejo de grandes cantidades de incidentes mediante paginación, mientras que la resolución de **DT-03** fortaleció la confiabilidad del proyecto al incorporar pruebas automatizadas con PostgreSQL real.
 
 Ambas mejoras fueron desarrolladas mediante Pull Requests y verificaciones de integración continua, proporcionando evidencia del proceso de mejora y mantenimiento del software.
 
 Las cuatro deudas restantes quedan documentadas como oportunidades de mejora para futuras versiones de IT Incident Hub.
+
+## Actualización de la versión v1.1.0
+
+El [PR #9](https://github.com/hwongg/IT-Incident-Hub/pull/9) amplió las pruebas de integración a siete, incorporó operaciones completas de edición y eliminación, y mejoró la interfaz. La ejecución de Azure Pipelines `#20261018.9` y las comprobaciones complementarias de GitHub Actions se completaron satisfactoriamente. Esta actualización no cambia el número de deudas identificadas (6) ni el de deudas resueltas (2).
