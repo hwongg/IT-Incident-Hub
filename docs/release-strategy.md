@@ -1,41 +1,39 @@
-# Estrategia de release
+# Estrategia de versiones y lanzamiento
 
-## Versionado semántico
+## Versionado
 
-Usar `MAJOR.MINOR.PATCH`:
+IT Incident Hub utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) y etiquetas Git asociadas a versiones publicadas. El historial incluye la primera versión estable `v1.0.0` y la actualización `v1.1.0`.
 
-- `0.1.0`: primera versión de desarrollo.
-- `0.2.0`: funcionalidad compatible añadida.
-- `0.3.0`: automatización y controles de calidad incorporados.
-- `1.0.0`: alcance acordado completado, pruebas y documentación revisadas.
+| Versión | Resultado |
+|---|---|
+| `v1.0.0` | Primera entrega funcional y release publicada |
+| `v1.1.0` | Dashboard renovado, CRUD completo, siete pruebas de integración y release publicada |
 
-No etiquetar `v1.0.0` hasta que el producto esté probado y los controles exigidos estén demostrados.
+Las releases están disponibles en https://github.com/hwongg/IT-Incident-Hub/releases.
 
 ## Ambientes
 
-1. Desarrollo: ejecución local con Docker Compose.
-2. Validación: artefacto de pipeline, pruebas y revisión del equipo.
-3. Producción/demo: publicación aprobada después de validar la versión candidata.
+- **Desarrollo:** aplicación y PostgreSQL mediante Docker Compose local.
+- **Validación:** ejecución de lint, pruebas y auditoría de dependencias; PostgreSQL de pruebas aislado y artefacto generado por Azure Pipelines.
+- **Demostración:** ejecución local de la versión aprobada y verificación funcional de sus principales operaciones.
 
-## Puertas de aprobación
+No se documenta un despliegue público de producción, ya que el sistema no cuenta con autenticación ni autorización.
 
-- Pull Request revisado.
-- Lint y pruebas exitosos.
-- Revisión de dependencias documentada.
-- Artefacto publicado.
-- Variables secretas fuera del repositorio.
-- Aprobación manual del responsable antes de liberar.
+## Controles previos a una publicación
 
-## Procedimiento de release
+La integración de cambios se realiza mediante Pull Requests. Antes de la publicación se revisan los resultados de GitHub Actions y Azure Pipelines, el estado de las pruebas, los artefactos y las limitaciones de seguridad. El responsable de la publicación confirma la versión y publica la GitHub Release.
 
-1. Cerrar los Work Items comprometidos para la versión.
-2. Verificar pipeline exitoso en `main`.
-3. Revisar changelog, pruebas y deuda conocida.
-4. Crear tag `v1.0.0` desde el commit aprobado.
-5. Asociar notas de versión y artefacto.
-6. Ejecutar smoke test en ambiente de demostración.
-7. Documentar resultado y procedimiento de rollback.
+La versión `v1.1.0` corresponde al [PR #9](https://github.com/hwongg/IT-Incident-Hub/pull/9) y al commit de fusión `bb87c88`. La ejecución `#20261018.9` de Azure Pipelines finalizó correctamente.
 
-## Rollback
+## Flujo de entrega
 
-Volver a desplegar el artefacto de la última versión aprobada. Si hubo cambios de esquema, aplicar un plan de reversión de base de datos previamente probado; no borrar el volumen de datos para simular un rollback.
+```text
+Azure Boards → Rama Git → Commit → Pull Request → Validaciones CI
+    → main → Artefacto → Etiqueta SemVer → GitHub Release → Demostración
+```
+
+Las ejecuciones fallidas se diagnostican y corrigen mediante cambios trazables; las evidencias están organizadas en `docs/evidencias/`.
+
+## Recuperación y rollback
+
+Ante un problema de aplicación, el procedimiento previsto consiste en volver a desplegar el código o artefacto de la última versión aprobada, conservando los datos persistentes de PostgreSQL. La reversión de cambios de esquema requiere un procedimiento específico de migración; **no** se elimina el volumen de la base de datos como mecanismo de rollback.

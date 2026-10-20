@@ -1,94 +1,150 @@
 # IT Incident Hub
 
-Aplicación web para registrar, asignar y dar seguimiento a incidentes de TI. Proyecto integrador para demostrar un flujo DevOps con Git, Azure Boards, Pull Requests, CI, pruebas, análisis de dependencias, artefactos y versionado.
+Sistema web para la gestión y el seguimiento de incidentes de tecnologías de la información. Centraliza el registro, la asignación, la atención y la consulta de incidentes, con comentarios, historial de cambios e indicadores operativos.
 
-## Requisitos
+El proyecto integrador demuestra un proceso DevOps trazable mediante Azure Boards, Git, Pull Requests, GitHub Actions, Azure Pipelines, pruebas automatizadas, revisión de dependencias, artefactos y GitHub Releases.
 
-- Docker Desktop con Docker Compose.
-- Git.
-- Node.js 22 o compatible para ejecutar pruebas locales.
-- Cuenta de Azure DevOps y cuenta de GitHub para completar las evidencias de la asignatura.
+**Última versión publicada:** [`v1.1.0`](https://github.com/hwongg/IT-Incident-Hub/releases/tag/v1.1.0)
+**Repositorio:** https://github.com/hwongg/IT-Incident-Hub
+**Azure DevOps:** https://dev.azure.com/hwongg/IT-Incident-Hub
 
-## Ejecutar con Docker
+## Tecnologías y arquitectura
 
-1. Copie `.env.example` como referencia. Para Docker Compose, la contraseña local predeterminada está en `compose.yaml`; cámbiela antes de un uso real.
-2. En la raíz del proyecto, ejecute:
+| Componente | Tecnología |
+|---|---|
+| Interfaz | HTML, CSS y JavaScript |
+| API REST | Node.js 22 y Express |
+| Base de datos | PostgreSQL 16 |
+| Contenedores | Docker y Docker Compose |
+| Calidad | ESLint, Node.js Test Runner, npm audit |
+| DevOps | Azure Boards, Azure Pipelines y GitHub Actions |
+| Versionado | Git, GitHub, Semantic Versioning |
 
-   ```bash
-   docker compose up --build -d
-   ```
-
-3. Abra `http://localhost:3000`.
-4. Verifique la API en `http://localhost:3000/api/health`.
-5. Ver registros:
-
-   ```bash
-   docker compose logs -f app
-   ```
-
-6. Detener:
-
-   ```bash
-   docker compose down
-   ```
-
-Para borrar también la base de datos de desarrollo y sus datos:
-
-```bash
-docker compose down -v
+```text
+Usuario → Navegador / Frontend → API REST (Express) → PostgreSQL
+                                     │
+                                     └→ Consultas SQL parametrizadas
 ```
 
-## Ejecutar pruebas locales
-
-```bash
-npm install
-npm run lint
-npm test
-npm audit --audit-level=high
-```
-
-La base de datos debe estar disponible para las pruebas de integración manuales; los tests incluidos prueban reglas de validación sin depender de PostgreSQL.
+La interfaz y la API se distribuyen en un contenedor de aplicación; PostgreSQL funciona en otro contenedor con almacenamiento persistente. El esquema relacional y los datos iniciales están definidos en [`database/init.sql`](database/init.sql). La arquitectura se describe con más detalle en [`docs/architecture.md`](docs/architecture.md).
 
 ## Funcionalidades
 
-- Crear y consultar incidentes.
-- Estados NUEVO, ASIGNADO, EN_PROCESO, RESUELTO y CERRADO.
-- Prioridades BAJA, MEDIA, ALTA y CRITICA.
-- Asignación de técnico.
-- Bitácora y comentarios por incidente.
-- Filtros por estado, prioridad, categoría, técnico y texto.
-- Dashboard de abiertos, cerrados, críticos y distribución por categoría/técnico.
-- API REST con persistencia PostgreSQL y consultas parametrizadas.
-- Docker Compose, endpoint de salud, cabeceras de seguridad y validación de entradas.
+- Registro de incidentes con título, descripción, categoría, prioridad, persona que reporta y técnico opcional.
+- Consulta, edición de los campos principales y eliminación con confirmación.
+- Estados `NUEVO`, `ASIGNADO`, `EN_PROCESO`, `RESUELTO` y `CERRADO`.
+- Prioridades `BAJA`, `MEDIA`, `ALTA` y `CRITICA`.
+- Comentarios e historial de modificaciones por incidente.
+- Filtros por estado, prioridad, categoría, técnico y texto, con paginación.
+- Dashboard con totales, incidentes abiertos, cerrados y críticos, y distribución por categoría y técnico.
+- API REST con validación de entradas y persistencia PostgreSQL.
 
-## API
+## API REST
 
-| Método | Ruta | Propósito |
+| Método | Ruta | Función |
 |---|---|---|
-| GET | `/api/health` | Estado de la API y base de datos |
-| GET | `/api/meta` | Estados y prioridades permitidos |
-| GET | `/api/incidents` | Listar y filtrar |
-| POST | `/api/incidents` | Crear incidente |
-| GET | `/api/incidents/:id` | Ver detalle y bitácora |
-| PATCH | `/api/incidents/:id` | Cambiar estado, técnico o prioridad |
-| POST | `/api/incidents/:id/comments` | Agregar comentario |
-| GET | `/api/dashboard` | Indicadores |
+| GET | `/api/health` | Verificación de la API y PostgreSQL |
+| GET | `/api/meta` | Estados y prioridades |
+| GET | `/api/incidents` | Listado, filtros y paginación (`limit`, `offset`) |
+| POST | `/api/incidents` | Registro de incidentes |
+| GET | `/api/incidents/:id` | Detalle y comentarios |
+| PATCH | `/api/incidents/:id` | Edición de incidentes |
+| DELETE | `/api/incidents/:id` | Eliminación de incidentes |
+| POST | `/api/incidents/:id/comments` | Publicación de comentarios |
+| GET | `/api/dashboard` | Indicadores y distribuciones |
 
-## Estructura
+## Requisitos y ejecución local
 
-- `backend/`: API Express.
-- `frontend/`: interfaz web.
-- `database/`: esquema SQL y datos iniciales.
-- `tests/`: pruebas automáticas.
-- `devops/`: plantillas de backlog y guía de evidencias.
-- `docs/`: arquitectura, ramas, seguridad, deuda técnica y release.
-- `.github/workflows/`: GitHub Actions.
-- `azure-pipelines.yml`: pipeline de Azure Pipelines.
+Docker Desktop con Docker Compose permite ejecutar la aplicación y la base de datos. Git se utiliza para obtener el código; Node.js 22 permite ejecutar las pruebas desde el equipo anfitrión.
 
-## Seguridad y limitaciones de la entrega inicial
+```bash
+# Iniciar aplicación y PostgreSQL
+docker compose up -d --build
 
-Este es un proyecto académico de demostración. No incluye autenticación ni autorización de usuarios, y no debe exponerse a Internet tal cual. Antes de un despliegue real, añada autenticación, permisos por rol, gestión de secretos en un vault, TLS, migraciones, copias de seguridad, limitación de solicitudes y pruebas de integración. No use la contraseña predeterminada fuera del entorno local.
+# Consultar el estado de los servicios
+docker compose ps
 
-## Responsables
+# Consultar registros
+docker compose logs -f app
 
-Complete aquí los nombres reales de los integrantes y sus responsabilidades. Si el proyecto es individual, use su cuenta principal y las cuentas adicionales solo si las reglas de su curso lo permiten; no simule revisiones que no hayan ocurrido.
+# Detener sin eliminar los datos persistentes
+docker compose down
+```
+
+**Interfaz:** http://localhost:3000
+**Salud de la API:** http://localhost:3000/api/health
+
+El volumen de PostgreSQL conserva los registros entre reinicios. Las variables de entorno se describen en `.env.example`; las credenciales predeterminadas de desarrollo no son apropiadas para despliegues públicos.
+
+## Pruebas y validaciones
+
+La versión `v1.1.0` cuenta con **13 pruebas unitarias y 7 pruebas de integración con PostgreSQL**, ejecutadas satisfactoriamente durante la validación de la versión.
+
+```bash
+npm ci
+npm run check
+npm run test:integration
+npm audit --audit-level=high
+```
+
+`npm run check` ejecuta ESLint y las pruebas unitarias. Las pruebas de integración requieren una base de datos **aislada** llamada `incident_hub_test`; Azure Pipelines la prepara mediante `compose.ci.yaml` y variables protegidas. No se ejecutan contra la base de datos principal `incident_hub`.
+
+## Proceso DevOps
+
+El trabajo se planificó en Azure Boards y se desarrolló mediante ramas y Pull Requests vinculados con los Work Items. Las validaciones de GitHub Actions y Azure Pipelines comprueban la calidad antes de integrar cambios en `main`.
+
+Azure Pipelines utiliza un agente Windows autohospedado. El flujo incluye instalación de dependencias, ESLint, pruebas unitarias, preparación de PostgreSQL de pruebas, pruebas de integración, auditoría de dependencias, empaquetado y publicación de un artefacto. El historial incluye un fallo controlado, su corrección y una ejecución posterior exitosa.
+
+Se identificaron **6 deudas técnicas** y se resolvieron **2**, documentadas en [`docs/technical-debt.md`](docs/technical-debt.md). La estrategia de aprobación, versionado y recuperación está en [`docs/release-strategy.md`](docs/release-strategy.md).
+
+## Versiones publicadas
+
+| Versión | Alcance |
+|---|---|
+| [`v1.0.0`](https://github.com/hwongg/IT-Incident-Hub/releases/tag/v1.0.0) | Primera versión funcional |
+| [`v1.1.0`](https://github.com/hwongg/IT-Incident-Hub/releases/tag/v1.1.0) | Dashboard renovado, CRUD completo y mejoras de seguimiento |
+
+La versión `v1.1.0` incorporó los cambios del [Pull Request #9](https://github.com/hwongg/IT-Incident-Hub/pull/9), con validaciones exitosas de GitHub Actions y Azure Pipelines.
+
+## Estructura del repositorio
+
+```text
+IT-Incident-Hub/
+├── backend/src/              # API Express
+├── frontend/                 # Interfaz web
+├── database/init.sql         # Modelo relacional y datos iniciales
+├── tests/                    # Pruebas unitarias y de integración
+├── devops/                   # Planificación y guías DevOps
+├── docs/
+│   ├── architecture.md
+│   ├── branching.md
+│   ├── security.md
+│   ├── technical-debt.md
+│   ├── release-strategy.md
+│   └── evidencias/
+│       ├── 01-azure-boards/
+│       ├── 02-pull-requests/
+│       ├── 03-github-actions/
+│       ├── 04-pipelines/
+│       ├── 05-docker/
+│       ├── 06-release/
+│       └── 07-aplicacion/
+├── .github/workflows/        # GitHub Actions
+├── azure-pipelines.yml       # Pipeline de Azure DevOps
+├── compose.yaml              # Ejecución local
+├── compose.ci.yaml           # PostgreSQL aislado para CI
+├── Dockerfile
+└── README.md
+```
+
+Las capturas de planificación, PR, CI, contenedores, releases y aplicación están organizadas en [`docs/evidencias/`](docs/evidencias/). Las evidencias complementan el historial verificable de GitHub y Azure DevOps.
+
+## Seguridad y alcance
+
+La aplicación incorpora validación de entradas, consultas parametrizadas y cabeceras de seguridad mediante Helmet. **No incluye autenticación ni autorización de usuarios** y está destinada a una demostración académica en un entorno controlado. Un despliegue público requeriría gestión de identidades y permisos, HTTPS, protección de secretos, limitación de solicitudes, copias de seguridad y migraciones de base de datos.
+
+Los controles y las decisiones pendientes se documentan en [`docs/security.md`](docs/security.md).
+
+## Autoría y contribuciones
+
+Proyecto académico IT Incident Hub. La autoría y las contribuciones pueden verificarse mediante el historial de commits, los Pull Requests y los Work Items vinculados en GitHub y Azure DevOps.
