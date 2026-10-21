@@ -78,7 +78,7 @@ El volumen de PostgreSQL conserva los registros entre reinicios. Las variables d
 
 ## Pruebas y validaciones
 
-La versión `v1.1.0` cuenta con **13 pruebas unitarias y 7 pruebas de integración con PostgreSQL**, ejecutadas satisfactoriamente durante la validación de la versión.
+La versión v1.1.0 incorporó 13 pruebas unitarias y 7 pruebas de integración con PostgreSQL. Posteriormente, el Pull Request #11 agregó tres pruebas unitarias adicionales. El estado actual de main cuenta con 16 pruebas unitarias y 7 pruebas de integración, todas aprobadas.
 
 ```bash
 npm ci
